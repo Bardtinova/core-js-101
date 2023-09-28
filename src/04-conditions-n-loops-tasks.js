@@ -178,16 +178,9 @@ function doRectanglesOverlap(rect1, rect2) {
  *
  */
 function isInsideCircle({ center, radius }, point) {
-  const distance = Math
-  if ((xBorder < point.x && yBorder < point.y) || (xCircle > point.x && yCircle > point.y)) {
-    console.log(false)
-    return false;
-  }
-  console.log(true)
-  return true;
+  const distance = Math.sqrt((point.x - center.x) ** 2 + (point.y - center.y) ** 2);
+  return distance < radius;
 }
-
-isInsideCircle({"center":{"x":0,"y":0},"radius":10}, {"x":0,"y":10})
 
 /**
  * Returns the first non repeated char in the specified strings otherwise returns null.
@@ -200,8 +193,13 @@ isInsideCircle({"center":{"x":0,"y":0},"radius":10}, {"x":0,"y":10})
  *   'abracadabra'  => 'c'
  *   'entente' => null
  */
-function findFirstSingleChar(/* str */) {
-  throw new Error('Not implemented');
+function findFirstSingleChar(str) {
+  for (let i = 0; i < str.length; i += 1) {
+    if (str.indexOf(str[i]) === str.lastIndexOf(str[i])) {
+      return str[i];
+    }
+  }
+  return null;
 }
 
 
@@ -227,8 +225,10 @@ function findFirstSingleChar(/* str */) {
  *   5, 3, true, true   => '[3, 5]'
  *
  */
-function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
-  throw new Error('Not implemented');
+function getIntervalString(a, b, isStartIncluded, isEndIncluded) {
+  const first = isStartIncluded ? '[' : '(';
+  const second = isEndIncluded ? ']' : ')';
+  return `${first}${Math.min(a, b)}, ${Math.max(a, b)}${second}`;
 }
 
 
@@ -244,8 +244,8 @@ function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
  * 'rotator' => 'rotator'
  * 'noon' => 'noon'
  */
-function reverseString(/* str */) {
-  throw new Error('Not implemented');
+function reverseString(str) {
+  return str.split('').reverse().join('');
 }
 
 
@@ -261,10 +261,9 @@ function reverseString(/* str */) {
  *   87354 => 45378
  *   34143 => 34143
  */
-function reverseInteger(/* num */) {
-  throw new Error('Not implemented');
+function reverseInteger(num) {
+  return Number(Array.from(String(num)).reverse().join(''));
 }
-
 
 /**
  * Validates the CCN (credit card number) and return true if CCN is valid
@@ -286,8 +285,25 @@ function reverseInteger(/* num */) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  const arr = [];
+  const ccnStr = Array.from(String(ccn)).reverse();
+  for (let i = 0; i < ccnStr.length; i += 1) {
+    if (i % 2 === 1) {
+      const m = parseInt(ccnStr[i], 10) * 2;
+      if (m > 9) {
+        arr.push(m - 9);
+      } else {
+        arr.push(m);
+      }
+    } else {
+      const n = parseInt(ccnStr[i], 10);
+      arr.push(n);
+    }
+  }
+
+  const summ = arr.reduce((a, b) => a + b);
+  return Boolean(!(summ % 10));
 }
 
 /**
@@ -304,8 +320,12 @@ function isCreditCardNumber(/* ccn */) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  if (String(num).length === 1) {
+    return num;
+  }
+  const sum = Array.from(String(num)).reduce((acc, cur) => acc + Number(cur), 0);
+  return getDigitalRoot(sum);
 }
 
 
@@ -330,10 +350,32 @@ function getDigitalRoot(/* num */) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
-}
+function isBracketsBalanced(str) {
+  const chars = str.split('');
+  const stack = [];
+  const open = ['{', '[', '(', '<'];
+  const close = ['}', ']', ')', '>'];
+  let closeIndex;
+  let openIndex;
+  for (let i = 0; i < str.length; i += 1) {
+    openIndex = open.indexOf(chars[i]);
+    if (openIndex !== -1) {
+      stack.push(openIndex);
+    }
 
+    closeIndex = close.indexOf(chars[i]);
+    if (closeIndex !== -1) {
+      openIndex = stack.pop();
+      if (closeIndex !== openIndex) {
+        return false;
+      }
+    }
+  }
+  if (stack.length !== 0) {
+    return false;
+  }
+  return true;
+}
 
 /**
  * Returns the string with n-ary (binary, ternary, etc, where n <= 10)
@@ -355,8 +397,8 @@ function isBracketsBalanced(/* str */) {
  *    365, 4  => '11231'
  *    365, 10 => '365'
  */
-function toNaryString(/* num, n */) {
-  throw new Error('Not implemented');
+function toNaryString(num, n) {
+  return num.toString(n);
 }
 
 
